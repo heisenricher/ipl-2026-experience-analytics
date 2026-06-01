@@ -112,8 +112,3 @@ This script automatically:
 2. Synthesizes the final play-off fixtures (Qualifier 2 and Grand Final) to complete the 74 matches.
 3. Sorts all 1243 historical and current matches chronologically.
 4. Generates the clean CSV files.
-
-## Provenance / Data Source
-
-- **Historical Data & League Matches:** Sourced from the official [Cricsheet Downloads page](https://cricsheet.org/downloads/) containing ball-by-ball match JSON files.
-- **Playoff Matches (Qualifier 2 & Grand Final):** Sourced from official match scorecards on [IPLT20](https://www.iplt20.com/) and [ESPNCricinfo](https://www.espncricinfo.com/) due to recent completion (May 29 and May 31, 2026) and delays in packaging.

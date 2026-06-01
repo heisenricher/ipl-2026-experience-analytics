@@ -1,0 +1,297 @@
+{
+  "title": "IPL 2026 Experience Analytics Dataset",
+  "id": "heisenricher/ipl-2026-experience-analytics",
+  "licenses": [
+    {
+      "name": "CC0-1.0"
+    }
+  ],
+  "subtitle": "IPL 2026 structured match database & player experience metrics.",
+  "description": "# IPL 2026 Experience Analytics Pipeline & Dataset\n\nA complete, structured dataset and analytical pipeline for the IPL 2026 season. This project parses ball-by-ball match data from Cricsheet, synthesizes the final playoff fixtures, and chronologically computes player career experience metrics (total IPL matches played prior to the start of each match).\n\n## Dataset Files & Row Counts\n\nThe following CSV files are included in the dataset:\n\n| File Name | Description | Row Count |\n| :--- | :--- | :---: |\n| `matches.csv` | Chronological list of all 74 IPL 2026 matches with scores, wickets, overs, and margins. | 74 |\n| `playing_xii.csv` | Squad member list (exactly 12 players per team per match) with captain, wicketkeeper, and impact player flags. | 1776 |\n| `player_experience_before_match.csv` | Career match count for each player strictly before the start of each match. | 1776 |\n| `team_experience_by_match.csv` | Total and average player career experience per team per match. | 148 |\n| `match_experience_summary.csv` | Match-level experience comparison, winner, and experience relationship status. | 74 |\n| `overall_experience_summary.csv` | Global tournament statistics and franchise-wise aggregates across all matches. | 11 |\n\n---\n\n## Data Dictionary\n\n### 1. `matches.csv`\n- `match_number`: Sequence number (1 to 74) in chronological order.\n- `date`: Match date (YYYY-MM-DD).\n- `venue`: Match venue.\n- `team1`: Team 1 name.\n- `team2`: Team 2 name.\n- `toss_winner`: Toss winning team.\n- `toss_decision`: Decision ('bat' or 'field').\n- `winner`: Match winner.\n- `margin`: Margin of victory (e.g. \"92 runs\", \"7 wickets\").\n- `team1_score`: Total runs scored by Team 1.\n- `team2_score`: Total runs scored by Team 2.\n- `team1_wickets`: Wickets lost by Team 1.\n- `team2_wickets`: Wickets lost by Team 2.\n- `team1_overs`: Overs bowled by Team 2 (legal deliveries / 6.0).\n- `team2_overs`: Overs bowled by Team 1 (legal deliveries / 6.0).\n\n### 2. `playing_xii.csv`\n- `match_number`: Sequence number (1 to 74) in chronological order.\n- `team`: Team name.\n- `player_name`: Player name.\n- `batting_position_if_available`: Batting order number (1 to 12), empty if did not bat.\n- `captain_flag`: 1 if captain, 0 otherwise.\n- `wicketkeeper_flag`: 1 if wicketkeeper, 0 otherwise.\n- `is_impact_player`: 1 if impact player, 0 otherwise.\n- `playing_order`: Sequence order in squad list (1 to 12).\n\n### 3. `player_experience_before_match.csv`\n- `match_number`: Sequence number (1 to 74) in chronological order.\n- `team`: Team name.\n- `player_name`: Player name.\n- `career_ipl_matches_before_match`: Career IPL matches played by the player before match start.\n\n### 4. `team_experience_by_match.csv`\n- `match_number`: Sequence number (1 to 74) in chronological order.\n- `team`: Team name.\n- `total_player_experience`: SUM(career_ipl_matches_before_match) of the 12 players.\n- `average_player_experience`: average of the 12 players (total / 12).\n\n### 5. `match_experience_summary.csv`\n- `match_number`: Sequence number (1 to 74) in chronological order.\n- `team1`: Team 1 name.\n- `team2`: Team 2 name.\n- `team1_total_experience`: Total player experience for Team 1.\n- `team2_total_experience`: Total player experience for Team 2.\n- `team1_average_experience`: Average player experience for Team 1.\n- `team2_average_experience`: Average player experience for Team 2.\n- `experience_difference`: ABS(team1_average_experience - team2_average_experience).\n- `winner`: Match winner name.\n- `winner_experience_status`: Status indicating if the winner had \"MORE\" or \"LESS\" experience than the opponent.\n\n### 6. `overall_experience_summary.csv`\n- `team_name`: \"Global\" or the respective franchise name.\n- `total_experience_sum`: Sum of experiences across all matching team-match records.\n- `matches_played`: Matches played by the team (or total team-match records for 'Global').\n- `total_players_considered`: Total players considered (matches_played * 12).\n- `average_experience`: Experience average of the team overall.\n\n---\n\n## Playing XII & Impact Player Assumptions\n\n- **Playing XII Size:** Every team-match record is standardized to exactly 12 players:\n  - If a team lists fewer than 12 players in Cricsheet, they are padded with a placeholder (e.g. `[Team Name] Substitute 12`) with 0 experience.\n  - If a team lists more than 12 players (e.g. due to sub fielders or concussion subs), they are truncated to the first 12 players listed in the Cricsheet JSON.\n- **Impact Player Flag:** The 12th player in the team's player list is assumed to be the Impact Player, as the starting XI is typically listed first.\n- **Batting Position:** Batting positions (1 to 12) are dynamically assigned based on the order in which batters walk out to the crease in their respective innings. Players who did not bat in the match have an empty value for this column.\n\n---\n\n## Validation & Quality Reports\n\nAll validation checks passed successfully:\n- Every IPL 2026 match exists: 70 league matches + 4 playoff matches = 74.\n- Total team-match records: 148.\n- Every team-match record contains exactly 12 players (Total rows: 1776).\n- Zero negative experience values.\n- Zero duplicate player rows per team-match.\n- Experience values are calculated strictly chronologically before each match start time.\n\n---\n\n## Reproduce the Dataset\n\nTo run the pipeline locally and generate the CSV files, execute:\n```bash\npython process_pipeline.py\n```\nThis script automatically:\n1. Downloads and extracts the Cricsheet IPL JSON files.\n2. Synthesizes the final play-off fixtures (Qualifier 2 and Grand Final) to complete the 74 matches.\n3. Sorts all 1243 historical and current matches chronologically.\n4. Generates the clean CSV files.\n\n## Provenance / Data Source\n\n- **Historical Data & League Matches:** Sourced from the official [Cricsheet Downloads page](https://cricsheet.org/downloads/) containing ball-by-ball match JSON files.\n- **Playoff Matches (Qualifier 2 & Grand Final):** Sourced from official match scorecards on [IPLT20](https://www.iplt20.com/) and [ESPNCricinfo](https://www.espncricinfo.com/) due to recent completion (May 29 and May 31, 2026) and delays in packaging.\n",
+  "keywords": [
+    "cricket",
+    "sports",
+    "data analytics",
+    "sports analytics"
+  ],
+  "resources": [
+    {
+      "path": "matches.csv",
+      "description": "Chronological list of all 74 IPL 2026 matches with scores, wickets, overs, and margins.",
+      "schema": {
+        "fields": [
+          {
+            "name": "match_number",
+            "description": "Sequence number (1 to 74) in chronological order.",
+            "type": "integer"
+          },
+          {
+            "name": "date",
+            "description": "Match date (YYYY-MM-DD).",
+            "type": "string"
+          },
+          {
+            "name": "venue",
+            "description": "Match venue.",
+            "type": "string"
+          },
+          {
+            "name": "team1",
+            "description": "Team 1 name.",
+            "type": "string"
+          },
+          {
+            "name": "team2",
+            "description": "Team 2 name.",
+            "type": "string"
+          },
+          {
+            "name": "toss_winner",
+            "description": "Toss winning team.",
+            "type": "string"
+          },
+          {
+            "name": "toss_decision",
+            "description": "Decision ('bat' or 'field').",
+            "type": "string"
+          },
+          {
+            "name": "winner",
+            "description": "Match winner.",
+            "type": "string"
+          },
+          {
+            "name": "margin",
+            "description": "Margin of victory.",
+            "type": "string"
+          },
+          {
+            "name": "team1_score",
+            "description": "Total runs scored by Team 1.",
+            "type": "integer"
+          },
+          {
+            "name": "team2_score",
+            "description": "Total runs scored by Team 2.",
+            "type": "integer"
+          },
+          {
+            "name": "team1_wickets",
+            "description": "Wickets lost by Team 1.",
+            "type": "integer"
+          },
+          {
+            "name": "team2_wickets",
+            "description": "Wickets lost by Team 2.",
+            "type": "integer"
+          },
+          {
+            "name": "team1_overs",
+            "description": "Overs bowled by Team 2.",
+            "type": "number"
+          },
+          {
+            "name": "team2_overs",
+            "description": "Overs bowled by Team 1.",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "path": "playing_xii.csv",
+      "description": "Squad member list (exactly 12 players per team per match) with captain, wicketkeeper, and impact player flags.",
+      "schema": {
+        "fields": [
+          {
+            "name": "match_number",
+            "description": "Sequence number (1 to 74) in chronological order.",
+            "type": "integer"
+          },
+          {
+            "name": "team",
+            "description": "Team name.",
+            "type": "string"
+          },
+          {
+            "name": "player_name",
+            "description": "Player name.",
+            "type": "string"
+          },
+          {
+            "name": "batting_position_if_available",
+            "description": "Batting order number (1 to 12), empty if did not bat.",
+            "type": "integer"
+          },
+          {
+            "name": "captain_flag",
+            "description": "1 if captain, 0 otherwise.",
+            "type": "integer"
+          },
+          {
+            "name": "wicketkeeper_flag",
+            "description": "1 if wicketkeeper, 0 otherwise.",
+            "type": "integer"
+          },
+          {
+            "name": "is_impact_player",
+            "description": "1 if impact player, 0 otherwise.",
+            "type": "integer"
+          },
+          {
+            "name": "playing_order",
+            "description": "Sequence order in squad list (1 to 12).",
+            "type": "integer"
+          }
+        ]
+      }
+    },
+    {
+      "path": "player_experience_before_match.csv",
+      "description": "Career match count for each player strictly before the start of each match.",
+      "schema": {
+        "fields": [
+          {
+            "name": "match_number",
+            "description": "Sequence number (1 to 74) in chronological order.",
+            "type": "integer"
+          },
+          {
+            "name": "team",
+            "description": "Team name.",
+            "type": "string"
+          },
+          {
+            "name": "player_name",
+            "description": "Player name.",
+            "type": "string"
+          },
+          {
+            "name": "career_ipl_matches_before_match",
+            "description": "Career IPL matches played by the player before match start.",
+            "type": "integer"
+          }
+        ]
+      }
+    },
+    {
+      "path": "team_experience_by_match.csv",
+      "description": "Total and average player career experience per team per match.",
+      "schema": {
+        "fields": [
+          {
+            "name": "match_number",
+            "description": "Sequence number (1 to 74) in chronological order.",
+            "type": "integer"
+          },
+          {
+            "name": "team",
+            "description": "Team name.",
+            "type": "string"
+          },
+          {
+            "name": "total_player_experience",
+            "description": "SUM(career_ipl_matches_before_match) of the 12 players.",
+            "type": "integer"
+          },
+          {
+            "name": "average_player_experience",
+            "description": "average of the 12 players (total / 12).",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "path": "match_experience_summary.csv",
+      "description": "Match-level experience comparison, winner, and experience relationship status.",
+      "schema": {
+        "fields": [
+          {
+            "name": "match_number",
+            "description": "Sequence number (1 to 74) in chronological order.",
+            "type": "integer"
+          },
+          {
+            "name": "team1",
+            "description": "Team 1 name.",
+            "type": "string"
+          },
+          {
+            "name": "team2",
+            "description": "Team 2 name.",
+            "type": "string"
+          },
+          {
+            "name": "team1_total_experience",
+            "description": "Total player experience for Team 1.",
+            "type": "integer"
+          },
+          {
+            "name": "team2_total_experience",
+            "description": "Total player experience for Team 2.",
+            "type": "integer"
+          },
+          {
+            "name": "team1_average_experience",
+            "description": "Average player experience for Team 1.",
+            "type": "number"
+          },
+          {
+            "name": "team2_average_experience",
+            "description": "Average player experience for Team 2.",
+            "type": "number"
+          },
+          {
+            "name": "experience_difference",
+            "description": "ABS(team1_average_experience - team2_average_experience).",
+            "type": "number"
+          },
+          {
+            "name": "winner",
+            "description": "Match winner name.",
+            "type": "string"
+          },
+          {
+            "name": "winner_experience_status",
+            "description": "Status indicating if the winner had 'MORE' or 'LESS' experience.",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "path": "overall_experience_summary.csv",
+      "description": "Global tournament statistics and franchise-wise aggregates across all matches.",
+      "schema": {
+        "fields": [
+          {
+            "name": "team_name",
+            "description": "'Global' or the respective franchise name.",
+            "type": "string"
+          },
+          {
+            "name": "total_experience_sum",
+            "description": "Sum of experiences across all matching team-match records.",
+            "type": "integer"
+          },
+          {
+            "name": "matches_played",
+            "description": "Matches played by the team.",
+            "type": "integer"
+          },
+          {
+            "name": "total_players_considered",
+            "description": "Total players considered (matches_played * 12).",
+            "type": "integer"
+          },
+          {
+            "name": "average_experience",
+            "description": "Experience average of the team overall.",
+            "type": "number"
+          }
+        ]
+      }
+    }
+  ]
+}
