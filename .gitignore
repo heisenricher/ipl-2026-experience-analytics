@@ -1,0 +1,7 @@
+ipl_data/
+ipl_json.zip
+__pycache__/
+*.pyc
+*.log
+.gemini/
+.git/
